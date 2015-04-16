@@ -37,32 +37,17 @@ class Player
   end
 end
 class AIBrain
-  attr_reader :count
-  def initialize
-    @count = -1
-  end
-
   def choose(puzzle)
-    @count += 1
-    if count > 2
-      'solve'
-    else
-      'spin'
-    end
+    'spin'
   end
 
   def pick_letter(puzzle)
-    if count == 0
-      'l'
-    elsif count == 1
-      'r'
-    else
-      'a'
-    end
+    (consonants - puzzle.guessed_letters).sample
   end
 
+  def consonants; 'bcdfghjklmnpqrstvwxyz'.split(''); end
   def solve(puzzle)
-    'Fartzilla'
+    ''
   end
 end
 class HumanBrain
@@ -106,7 +91,7 @@ class Game
     @wheel  = Wheel.new
     ai = AIBrain.new
     human = HumanBrain.new
-    @players = [Player.new(human,wheel), Player.new(ai,wheel), Player.new(ai,wheel)]
+    @players = [Player.new(ai,wheel), Player.new(ai,wheel), Player.new(human,wheel)]
   end
 
   def vowels; ['a','e','i','o','u']; end
@@ -149,9 +134,10 @@ class Game
     else
       value = 100 * letters_revealed * wheel.value
     end
-    puts "So that will #{value > 0 ? 'earn' : 'cost'} #{player.name} $#{value}"
-
-    player.add(value)
+    if !value.zero?
+      puts "So that will #{value > 0 ? 'earn' : 'cost'} #{player.name} $#{value}"
+      player.add(value)
+    end
 
     letters_revealed > 0
   end
@@ -166,7 +152,7 @@ class Game
   end
 end
 class Puzzle
-  attr_reader :revealed_letters
+  attr_reader :revealed_letters, :guessed_letters
   def initialize
     @revealed_letters = []
     @guessed_letters  = []
