@@ -1,4 +1,5 @@
 require 'faker'
+require 'pry'
 class Wheel
   attr_reader :value
   def initialize
@@ -160,7 +161,7 @@ class Puzzle
   def initialize
     @revealed_letters = []
     @guessed_letters  = []
-    @puzzle = 'fartzilla'
+    @puzzle = Faker::Company.catch_phrase.downcase
   end
 
   def solved_by?(guess)
@@ -178,7 +179,7 @@ class Puzzle
   end
 
   def puzzle
-    @puzzle.gsub(/[#{unrevealed}]/, '*')
+    @puzzle.gsub(' ', '&').gsub(/[#{unrevealed}]/, '*').gsub('&', ' ')
   end
 
   private
