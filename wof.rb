@@ -1,5 +1,4 @@
-require 'pp'
-require 'pry'
+require 'faker'
 class Wheel
   attr_reader :value
   def initialize
@@ -11,8 +10,8 @@ class Wheel
 end
 class Player
   attr_reader :name, :brain, :wheel, :money
-  def initialize(brain, wheel)
-    @name = rand(10)
+  def initialize(brain, wheel, name=nil)
+    @name = name || Faker::Name.name
     @money = 0
     @brain = brain
     @wheel = wheel
@@ -23,17 +22,22 @@ class Player
     if choice == 'solve'
       brain.solve(puzzle)
     else
-      if choice == 'spin'
-        spin_value = wheel.spin
-        puts "Ticktickticktick \ntick tick tick tick \ntick   tick    tick    tick"
-        puts "#{@name} has spun a #{spin_value}!"
-      end
-      brain.pick_letter(puzzle)
+      pick_letter(puzzle, choice)
     end
   end
+
   def add(amount)
     @money += amount
     puts "#{name}: You have a total of $#{money}"
+  end
+
+  def pick_letter(puzzle, choice)
+    if choice == 'spin'
+      spin_value = wheel.spin
+      puts "Ticktickticktick \ntick tick tick tick \ntick   tick    tick    tick"
+      puts "#{@name} has spun a #{spin_value}!"
+    end
+    brain.pick_letter(puzzle)
   end
 end
 class AIBrain
@@ -86,12 +90,12 @@ class HumanBrain
 end
 class Game
   attr_reader :puzzle, :wheel, :players
-  def initialize
+  def initialize(name=nil)
     @puzzle = Puzzle.new
     @wheel  = Wheel.new
     ai = AIBrain.new
     human = HumanBrain.new
-    @players = [Player.new(ai,wheel), Player.new(ai,wheel), Player.new(human,wheel)]
+    @players = [Player.new(ai,wheel), Player.new(ai,wheel), Player.new(human,wheel, name)]
   end
 
   def vowels; ['a','e','i','o','u']; end
@@ -182,5 +186,7 @@ class Puzzle
     @puzzle.split('') - revealed_letters
   end
 end
-game = Game.new
+puts 'Enter your name:'
+name = gets.chomp
+game = Game.new(name)
 game.play
