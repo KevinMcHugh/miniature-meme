@@ -6,8 +6,8 @@ class Wheel
     @value = 0
   end
   def spin
-    # todo: jackpot, lose_a_turn, :free_spin, :bankrupt
-    @spaces ||= [3500, 300, 600, 800, 550, 400, 300, 900, 500, 900, :bankrupt, 600, 400, 300, 800, 350, 450, 700, 300, 600]
+    # todo: jackpot, lose_a_turn, :free_spin
+    @spaces ||= [3500, 300, 600, :bankrupt, 800, 550, 400, 300, 900, 500, 900, :bankrupt, 600, 400, 300, 800, 350, 450, 700, 300, 600]
     @value = @spaces.sample
   end
 end
@@ -38,9 +38,17 @@ class Player
     if choice == 'spin'
       spin_value = wheel.spin
       puts "Ticktickticktick \ntick tick tick tick \ntick   tick    tick    tick"
-      puts "#{@name} has spun a #{spin_value}!"
+      if spin_value.is_a? Numeric
+        puts "#{@name} has spun a #{spin_value}!"
+        brain.pick_letter(puzzle)
+      elsif spin_value == :bankrupt
+        puts "BANKRUPT! #{@name} is bankrupt!!!"
+        @money = 0
+        nil
+      end
+    elsif choice == 'buy'
+      brain.pick_letter(puzzle)
     end
-    brain.pick_letter(puzzle)
   end
 end
 class AIBrain
@@ -115,16 +123,20 @@ class Game
         while take_next_turn
           puts player_start_turn_message(player, previous_player)
           choice = player.take_turn(puzzle)
-          if puzzle.solved_by?(choice)
-            end_game(player)
-            return player
-          end
-          if choice.length == 1
-            take_next_turn = give_or_take_money(player, choice)
-            previous_player = player
+          if choice
+            if puzzle.solved_by?(choice)
+              end_game(player)
+              return player
+            end
+            if choice.length == 1
+              take_next_turn = give_or_take_money(player, choice)
+              previous_player = player
+            else
+              take_next_turn = false
+              puts "Sorry, #{player.name}, #{choice} is incorrect."
+            end
           else
             take_next_turn = false
-            puts "Sorry, #{player.name}, #{choice} is incorrect."
           end
         end
       end
@@ -140,9 +152,9 @@ class Game
     letters_revealed = puzzle.reveal(choice)
     puts "There are #{letters_revealed} #{choice}s!"
     if vowels.include?(choice)
-      value = -1 * 100 * 2.5 * letters_revealed
+      value = -250 * letters_revealed
     else
-      value = 100 * letters_revealed * wheel.value
+      value = letters_revealed * wheel.value
     end
     if !value.zero?
       puts "So that will #{value > 0 ? 'earn' : 'cost'} #{player.name} $#{value}"
