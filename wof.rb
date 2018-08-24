@@ -59,12 +59,15 @@ class HumanBrain
 
   def choose(puzzle)
     puts current_state(puzzle)
-    puts 'You can:'
-    puts '1) spin,'
-    puts '2) buy a vowel, or'
-    puts '3) solve the puzzle'
-    choices = ['spin','buy','solve']
-    choices[input.to_i - 1]
+    choice = 0
+    until choice != 0
+      puts 'You can:'
+      puts '1) spin,'
+      puts '2) buy a vowel, or'
+      puts '3) solve the puzzle'
+      choice = input.to_i
+    end
+    ['spin','buy','solve'][choice - 1]
   end
 
   def pick_letter(puzzle)
@@ -81,7 +84,7 @@ class HumanBrain
   end
 
   def current_state(puzzle)
-    "The puzzle is currently: #{puzzle.puzzle}"
+    "The puzzle is currently: #{puzzle.puzzle.upcase}"
   end
 
   def input
@@ -165,7 +168,7 @@ class Puzzle
   end
 
   def solved_by?(guess)
-    @puzzle == guess.downcase
+    @puzzle == guess&.downcase
   end
 
   def reveal(letter)
