@@ -6,7 +6,9 @@ class Wheel
     @value = 0
   end
   def spin
-    @value = (0..10).to_a.sample
+    # todo: jackpot, lose_a_turn, :free_spin, :bankrupt
+    @spaces ||= [3500, 300, 600, 800, 550, 400, 300, 900, 500, 900, :bankrupt, 600, 400, 300, 800, 350, 450, 700, 300, 600]
+    @value = @spaces.sample
   end
 end
 class Player
